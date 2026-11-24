@@ -27,6 +27,7 @@ from app.models.enums import (
     EffectivenessStatus,
     ApprovalStatus,
     AuditAction,
+    AIExecutionStatus,
 )
 from app.models.user import User, Role, UserRole
 from app.models.investigation import Investigation, InvestigationCounter
@@ -46,6 +47,7 @@ from app.models.capa import CAPA, CAPATask, EffectivenessCheck
 from app.models.approval import Approval
 from app.models.audit import AuditLog
 from app.models.token import RefreshToken
+from app.models.ai_execution import AIExecution
 
 __all__ = [
     # Enums
@@ -70,6 +72,7 @@ __all__ = [
     "EffectivenessStatus",
     "ApprovalStatus",
     "AuditAction",
+    "AIExecutionStatus",
     # Models
     "User",
     "Role",
@@ -92,4 +95,5 @@ __all__ = [
     "Approval",
     "AuditLog",
     "RefreshToken",
+    "AIExecution",
 ]

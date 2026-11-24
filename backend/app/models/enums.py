@@ -158,3 +158,12 @@ class AuditAction(str, enum.Enum):
     STATUS_CHANGE = "STATUS_CHANGE"
     READ = "READ"
     DOWNLOAD = "DOWNLOAD"
+    AI_EXECUTE = "AI_EXECUTE"
+
+
+class AIExecutionStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
