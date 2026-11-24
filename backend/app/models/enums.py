@@ -165,6 +165,12 @@ class AuditAction(str, enum.Enum):
     AI_FIELD_ACCEPTED = "AI_FIELD_ACCEPTED"
     AI_FIELD_REJECTED = "AI_FIELD_REJECTED"
     AI_EXTRACTION_REJECTED = "AI_EXTRACTION_REJECTED"
+    RISK_ASSESSMENT_REQUESTED = "RISK_ASSESSMENT_REQUESTED"
+    RISK_ASSESSMENT_COMPLETED = "RISK_ASSESSMENT_COMPLETED"
+    RISK_ASSESSMENT_REVIEWED = "RISK_ASSESSMENT_REVIEWED"
+    RISK_ASSESSMENT_ACCEPTED = "RISK_ASSESSMENT_ACCEPTED"
+    RISK_ASSESSMENT_REJECTED = "RISK_ASSESSMENT_REJECTED"
+    RISK_ASSESSMENT_INFO_REQUESTED = "RISK_ASSESSMENT_INFO_REQUESTED"
 
 
 class AIExecutionStatus(str, enum.Enum):
@@ -199,5 +205,50 @@ class FieldReviewDecision(str, enum.Enum):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
+
+
+class RiskClassification(str, enum.Enum):
+    CRITICAL = "Critical"
+    HIGH = "High"
+    MEDIUM = "Medium"
+    LOW = "Low"
+    UNDETERMINED = "Undetermined"
+
+
+class RiskLikelihood(str, enum.Enum):
+    HIGH = "High"
+    MEDIUM = "Medium"
+    LOW = "Low"
+    UNDETERMINED = "Undetermined"
+
+
+class RiskDetectability(str, enum.Enum):
+    HIGH = "High"
+    MEDIUM = "Medium"
+    LOW = "Low"
+    UNDETERMINED = "Undetermined"
+
+
+class InvestigationUrgency(str, enum.Enum):
+    IMMEDIATE = "Immediate Quality Review"
+    URGENT = "Urgent Review"
+    STANDARD = "Standard Review"
+    INFO_REQUIRED = "Additional Information Required"
+
+
+class RiskAssessmentStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class RiskAssessmentReviewStatus(str, enum.Enum):
+    PENDING_REVIEW = "PENDING_REVIEW"
+    NEEDS_MORE_INFORMATION = "NEEDS_MORE_INFORMATION"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    SUPERSEDED = "SUPERSEDED"
+
 
 

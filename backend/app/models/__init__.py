@@ -32,6 +32,12 @@ from app.models.enums import (
     ExtractionReviewStatus,
     FieldExtractionStatus,
     FieldReviewDecision,
+    RiskClassification,
+    RiskLikelihood,
+    RiskDetectability,
+    InvestigationUrgency,
+    RiskAssessmentStatus,
+    RiskAssessmentReviewStatus,
 )
 from app.models.user import User, Role, UserRole
 from app.models.investigation import Investigation, InvestigationCounter
@@ -53,6 +59,7 @@ from app.models.audit import AuditLog
 from app.models.token import RefreshToken
 from app.models.ai_execution import AIExecution
 from app.models.incident_extraction import IncidentExtraction
+from app.models.risk_assessment import RiskAssessment
 
 __all__ = [
     # Enums
@@ -82,6 +89,12 @@ __all__ = [
     "ExtractionReviewStatus",
     "FieldExtractionStatus",
     "FieldReviewDecision",
+    "RiskClassification",
+    "RiskLikelihood",
+    "RiskDetectability",
+    "InvestigationUrgency",
+    "RiskAssessmentStatus",
+    "RiskAssessmentReviewStatus",
     # Models
     "User",
     "Role",
@@ -106,4 +119,5 @@ __all__ = [
     "RefreshToken",
     "AIExecution",
     "IncidentExtraction",
+    "RiskAssessment",
 ]
