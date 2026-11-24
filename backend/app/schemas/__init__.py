@@ -105,6 +105,21 @@ from app.schemas.audit import (
     AuditLogCreate,
     AuditLogResponse,
 )
+from app.schemas.extraction import (
+    SourceReference,
+    ExtractedField,
+    MissingInformationItem,
+    ConflictingInformationItem,
+    DocumentProcessingSummary,
+    ExtractionStructuredOutput,
+    IncidentExtractionRequest,
+    IncidentExtractionResponse,
+    FieldReviewUpdateRequest,
+    ExtractionReviewPatchRequest,
+    FieldAcceptanceRequest,
+    FieldRejectionRequest,
+    ExtractionReviewViewResponse,
+)
 
 __all__ = [
     "HealthStatusResponse",
@@ -178,5 +193,18 @@ __all__ = [
     "AuditLogBase",
     "AuditLogCreate",
     "AuditLogResponse",
+    "SourceReference",
+    "ExtractedField",
+    "MissingInformationItem",
+    "ConflictingInformationItem",
+    "DocumentProcessingSummary",
+    "ExtractionStructuredOutput",
+    "IncidentExtractionRequest",
+    "IncidentExtractionResponse",
+    "FieldReviewUpdateRequest",
+    "ExtractionReviewPatchRequest",
+    "FieldAcceptanceRequest",
+    "FieldRejectionRequest",
+    "ExtractionReviewViewResponse",
 ]
 
