@@ -8,10 +8,13 @@ from app.models.user import User
 from app.repositories.investigation_repository import investigation_repo
 from app.repositories.ai_execution_repository import ai_execution_repo
 from app.repositories.incident_extraction_repository import incident_extraction_repo
+from app.repositories.risk_assessment_repository import risk_assessment_repo
 from app.ai.services.ai_service import get_ai_service, AIService
 from app.services.incident_extraction_service import incident_extraction_service
+from app.services.risk_assessment_service import risk_assessment_service
 from app.ai.schemas.common import WorkflowExecutionInput
 from app.ai.schemas.execution import AIHealthResponse, AIExecutionResponse
+from app.models.enums import RoleName
 from app.schemas.extraction import (
     IncidentExtractionRequest,
     IncidentExtractionResponse,
@@ -19,6 +22,15 @@ from app.schemas.extraction import (
     ExtractionReviewPatchRequest,
     FieldAcceptanceRequest,
     FieldRejectionRequest,
+)
+from app.schemas.risk_assessment import (
+    RiskAssessmentRequest,
+    RiskAssessmentResponse,
+    RiskAssessmentReviewPatchRequest,
+    RiskAssessmentAcceptRequest,
+    RiskAssessmentRejectRequest,
+    RiskAssessmentInfoRequest,
+    RiskAssessmentReviewViewResponse,
 )
 
 router = APIRouter(tags=["AI Foundation & Incident Extraction"])
@@ -434,3 +446,305 @@ async def reject_incident_extraction(
         reject_req=reject_req,
     )
     return IncidentExtractionResponse.model_validate(updated_extraction)
+
+
+# ---------------------------------------------------------------------------
+# AI Quality Impact and Risk Assessment Endpoints
+# ---------------------------------------------------------------------------
+
+@router.post(
+    "/investigations/{investigation_id}/ai/risk-assessments",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Trigger AI Quality Impact & Risk Assessment",
+    description="Evaluates 6 quality risk dimensions from confirmed incident information and document evidence. Generates unconfirmed draft risk evaluation.",
+)
+async def start_risk_assessment(
+    investigation_id: str,
+    request: RiskAssessmentRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentResponse:
+    """Initiates LangGraph Quality and Risk Assessment for an authorized investigation."""
+    investigation = await investigation_repo.get(session, investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Investigation {investigation_id} not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to trigger risk assessment for this investigation.",
+        )
+
+    assessment = await risk_assessment_service.start_risk_assessment(
+        session=session,
+        user=current_user,
+        investigation_id=investigation_id,
+        request=request,
+    )
+    return RiskAssessmentResponse.model_validate(assessment)
+
+
+@router.get(
+    "/investigations/{investigation_id}/ai/risk-assessments",
+    response_model=List[RiskAssessmentResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List Quality Risk Assessments for Investigation",
+    description="Retrieves historical quality risk assessments ordered newest first.",
+)
+async def list_risk_assessments(
+    investigation_id: str,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> List[RiskAssessmentResponse]:
+    """Lists all risk assessment runs for an authorized investigation."""
+    investigation = await investigation_repo.get(session, investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Investigation {investigation_id} not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to view risk assessments for this investigation.",
+        )
+
+    assessments = await risk_assessment_service.get_assessments_by_investigation(
+        session=session,
+        investigation_id=investigation_id,
+        skip=skip,
+        limit=limit,
+    )
+    return [RiskAssessmentResponse.model_validate(a) for a in assessments]
+
+
+@router.get(
+    "/ai/risk-assessments/{assessment_id}",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Risk Assessment Details",
+    description="Retrieves complete structured quality and risk assessment record.",
+)
+async def get_risk_assessment(
+    assessment_id: str,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentResponse:
+    """Retrieves risk assessment record by UUID with authorization check."""
+    assessment = await risk_assessment_service.get_assessment(session, assessment_id)
+    investigation = await investigation_repo.get(session, assessment.investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Associated investigation not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to view this risk assessment.",
+        )
+
+    return RiskAssessmentResponse.model_validate(assessment)
+
+
+@router.get(
+    "/ai/risk-assessments/{assessment_id}/review",
+    response_model=RiskAssessmentReviewViewResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Risk Assessment QA Review View",
+    description="Returns detailed view tailored for human QA review, including unreviewed data flags and matrix rules.",
+)
+async def get_risk_assessment_review(
+    assessment_id: str,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentReviewViewResponse:
+    """Constructs dedicated QA review payload for risk assessment."""
+    assessment = await risk_assessment_service.get_assessment(session, assessment_id)
+    investigation = await investigation_repo.get(session, assessment.investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Associated investigation not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to review this risk assessment.",
+        )
+
+    return await risk_assessment_service.get_review_view(session, assessment_id)
+
+
+@router.patch(
+    "/ai/risk-assessments/{assessment_id}/review",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update Risk Assessment Review Decision / Overrides",
+    description="Allows authorized investigator or QA to record notes, overrides, or preliminary review status.",
+)
+async def update_risk_assessment_review(
+    assessment_id: str,
+    patch_req: RiskAssessmentReviewPatchRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentResponse:
+    """Updates review decisions and field overrides for risk assessment."""
+    assessment = await risk_assessment_service.get_assessment(session, assessment_id)
+    investigation = await investigation_repo.get(session, assessment.investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Associated investigation not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to update this risk assessment review.",
+        )
+
+    updated = await risk_assessment_service.update_review(
+        session=session,
+        user=current_user,
+        assessment_id=assessment_id,
+        request=patch_req,
+    )
+    return RiskAssessmentResponse.model_validate(updated)
+
+
+@router.post(
+    "/ai/risk-assessments/{assessment_id}/accept",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Accept Quality Risk Assessment",
+    description="Explicit human QA acceptance action: supersedes previous assessments and synchronizes risk level to parent Investigation.",
+)
+async def accept_risk_assessment(
+    assessment_id: str,
+    accept_req: RiskAssessmentAcceptRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentResponse:
+    """Formally accepts quality risk assessment with investigation synchronization."""
+    assessment = await risk_assessment_service.get_assessment(session, assessment_id)
+    investigation = await investigation_repo.get(session, assessment.investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Associated investigation not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to accept risk assessments for this investigation.",
+        )
+
+    user_role_names = {r.name for r in current_user.roles}
+    qa_roles = {"Admin", "QA", "QA Approver", "Investigator"}
+    if not user_role_names.intersection(qa_roles):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Only QA, QA Approver, Admin, or Investigator can accept risk assessments.",
+        )
+
+    updated = await risk_assessment_service.accept_assessment(
+        session=session,
+        user=current_user,
+        assessment_id=assessment_id,
+        request=accept_req,
+    )
+    return RiskAssessmentResponse.model_validate(updated)
+
+
+@router.post(
+    "/ai/risk-assessments/{assessment_id}/reject",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Reject Quality Risk Assessment",
+    description="Marks risk assessment as REJECTED. Leaves investigation risk level and priority unchanged.",
+)
+async def reject_risk_assessment(
+    assessment_id: str,
+    reject_req: RiskAssessmentRejectRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentResponse:
+    """Rejects risk assessment with documented reason."""
+    assessment = await risk_assessment_service.get_assessment(session, assessment_id)
+    investigation = await investigation_repo.get(session, assessment.investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Associated investigation not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to reject this risk assessment.",
+        )
+
+    updated = await risk_assessment_service.reject_assessment(
+        session=session,
+        user=current_user,
+        assessment_id=assessment_id,
+        request=reject_req,
+    )
+    return RiskAssessmentResponse.model_validate(updated)
+
+
+@router.post(
+    "/ai/risk-assessments/{assessment_id}/request-information",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Request Information for Inconclusive Risk Assessment",
+    description="Transitions assessment to NEEDS_MORE_INFORMATION and logs requested data points.",
+)
+async def request_risk_assessment_info(
+    assessment_id: str,
+    info_req: RiskAssessmentInfoRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_active_user),
+) -> RiskAssessmentResponse:
+    """Requests additional evidence or clarification for risk assessment."""
+    assessment = await risk_assessment_service.get_assessment(session, assessment_id)
+    investigation = await investigation_repo.get(session, assessment.investigation_id)
+    if not investigation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Associated investigation not found.",
+        )
+
+    has_access = await verify_investigation_access(investigation, current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to request information for this risk assessment.",
+        )
+
+    updated = await risk_assessment_service.request_additional_information(
+        session=session,
+        user=current_user,
+        assessment_id=assessment_id,
+        request=info_req,
+    )
+    return RiskAssessmentResponse.model_validate(updated)
+
