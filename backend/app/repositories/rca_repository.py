@@ -1,7 +1,7 @@
 import copy
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
-from sqlalchemy import select, desc, func, update
+from sqlalchemy import select, desc, func, update, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -221,6 +221,42 @@ class RCARepository(BaseRepository[RCAAnalysis, RCAAnalysisCreate, RCAAnalysisBa
         await session.refresh(db_obj)
         return db_obj
 
+    async def add_root_cause(
+        self, session: AsyncSession, *, rca_id: str, obj_in: RootCauseCreate
+    ) -> RootCause:
+        db_obj = RootCause(**obj_in.model_dump(), rca_analysis_id=rca_id)
+        session.add(db_obj)
+        await session.flush()
+        await session.refresh(db_obj)
+        return db_obj
+
+    async def add_why_step(
+        self, session: AsyncSession, *, rca_id: str, obj_in: WhyAnalysisStepCreate
+    ) -> WhyAnalysisStep:
+        db_obj = WhyAnalysisStep(**obj_in.model_dump(), rca_analysis_id=rca_id)
+        session.add(db_obj)
+        await session.flush()
+        await session.refresh(db_obj)
+        return db_obj
+
+    async def add_fishbone_category(
+        self, session: AsyncSession, *, rca_id: str, name: str
+    ) -> FishboneCategory:
+        db_obj = FishboneCategory(rca_analysis_id=rca_id, name=name)
+        session.add(db_obj)
+        await session.flush()
+        await session.refresh(db_obj)
+        return db_obj
+
+    async def add_fishbone_cause(
+        self, session: AsyncSession, *, category_id: str, obj_in: FishboneCauseCreate
+    ) -> FishboneCause:
+        db_obj = FishboneCause(**obj_in.model_dump(), category_id=category_id)
+        session.add(db_obj)
+        await session.flush()
+        await session.refresh(db_obj)
+        return db_obj
+
     async def sync_relational_child_records(
         self, session: AsyncSession, rca: RCAAnalysis
     ) -> None:
@@ -230,9 +266,9 @@ class RCARepository(BaseRepository[RCAAnalysis, RCAAnalysisCreate, RCAAnalysisBa
         """
         # 1. Sync 5 Whys
         if rca.five_whys_data:
-            # Clear existing steps
-            for step in list(rca.why_steps):
-                await session.delete(step)
+            await session.execute(
+                delete(WhyAnalysisStep).where(WhyAnalysisStep.rca_analysis_id == rca.id)
+            )
             for item in rca.five_whys_data:
                 db_step = WhyAnalysisStep(
                     rca_analysis_id=rca.id,
@@ -250,8 +286,16 @@ class RCARepository(BaseRepository[RCAAnalysis, RCAAnalysisCreate, RCAAnalysisBa
 
         # 2. Sync Fishbone Categories and Causes
         if rca.fishbone_data:
-            for cat in list(rca.fishbone_categories):
-                await session.delete(cat)
+            cat_ids_stmt = select(FishboneCategory.id).where(FishboneCategory.rca_analysis_id == rca.id)
+            cat_ids_res = await session.execute(cat_ids_stmt)
+            cat_ids = cat_ids_res.scalars().all()
+            if cat_ids:
+                await session.execute(
+                    delete(FishboneCause).where(FishboneCause.category_id.in_(cat_ids))
+                )
+                await session.execute(
+                    delete(FishboneCategory).where(FishboneCategory.rca_analysis_id == rca.id)
+                )
             for cat_name, causes_list in rca.fishbone_data.items():
                 db_cat = FishboneCategory(rca_analysis_id=rca.id, name=cat_name)
                 session.add(db_cat)
@@ -271,8 +315,9 @@ class RCARepository(BaseRepository[RCAAnalysis, RCAAnalysisCreate, RCAAnalysisBa
 
         # 3. Sync Root Causes
         if rca.root_causes_data:
-            for rc in list(rca.root_causes):
-                await session.delete(rc)
+            await session.execute(
+                delete(RootCause).where(RootCause.rca_analysis_id == rca.id)
+            )
             for rc_item in rca.root_causes_data:
                 db_rc = RootCause(
                     rca_analysis_id=rca.id,

@@ -45,6 +45,15 @@ class WhyStepItem(BaseModel):
     causal_leap_detected: bool = Field(default=False, description="True if jump between previous answer and question is ungrounded")
     reasoning_critique: Optional[str] = Field(None, description="Critique of causal logic e.g. circular or repeated reasoning")
 
+    @field_validator("verification_status", mode="before")
+    @classmethod
+    def normalize_verification_status(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseStatus.__members__:
+                return CauseStatus[v_norm]
+        return v
+
 
 class FishboneCauseItem(BaseModel):
     """Specific cause node attached to an Ishikawa 6M category branch."""
@@ -65,6 +74,24 @@ class FishboneCauseItem(BaseModel):
     related_why_step: Optional[int] = Field(None, description="Associated 5 Whys step number if correlated")
     rejection_reason: Optional[str] = Field(None, description="Documented reason if cause was rejected")
 
+    @field_validator("classification", mode="before")
+    @classmethod
+    def normalize_classification(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseClassification.__members__:
+                return CauseClassification[v_norm]
+        return v
+
+    @field_validator("verification_status", mode="before")
+    @classmethod
+    def normalize_verification_status(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseStatus.__members__:
+                return CauseStatus[v_norm]
+        return v
+
 
 class RootCauseItem(BaseModel):
     """A verified or proposed primary underlying root cause."""
@@ -79,6 +106,15 @@ class RootCauseItem(BaseModel):
     confidence: float = Field(default=0.85, ge=0.0, le=1.0)
     verification_status: CauseStatus = Field(default=CauseStatus.PROPOSED)
     human_confirmed: bool = Field(default=False, description="True only after authorized QA human sign-off")
+
+    @field_validator("verification_status", mode="before")
+    @classmethod
+    def normalize_verification_status(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseStatus.__members__:
+                return CauseStatus[v_norm]
+        return v
 
 
 class ContributingFactorItem(BaseModel):
@@ -219,6 +255,15 @@ class ManualCauseCreateRequest(BaseModel):
     classification: CauseClassification = Field(default=CauseClassification.POSSIBLE_CAUSE)
     supporting_references: List[RCAEvidenceReference] = Field(default_factory=list)
 
+    @field_validator("classification", mode="before")
+    @classmethod
+    def normalize_classification(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseClassification.__members__:
+                return CauseClassification[v_norm]
+        return v
+
 
 class CausePatchRequest(BaseModel):
     """Edit an existing cause in RCA."""
@@ -230,6 +275,24 @@ class CausePatchRequest(BaseModel):
     verification_status: Optional[CauseStatus] = None
     rejection_reason: Optional[str] = None
     potential_impact: Optional[str] = None
+
+    @field_validator("classification", mode="before")
+    @classmethod
+    def normalize_classification(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseClassification.__members__:
+                return CauseClassification[v_norm]
+        return v
+
+    @field_validator("verification_status", mode="before")
+    @classmethod
+    def normalize_verification_status(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_norm = v.upper().replace(" ", "_").replace("-", "_")
+            if v_norm in CauseStatus.__members__:
+                return CauseStatus[v_norm]
+        return v
 
 
 class CauseVerifyRequest(BaseModel):

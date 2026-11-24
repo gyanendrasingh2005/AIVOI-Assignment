@@ -98,19 +98,28 @@ class RCAService:
         )
         new_version = latest_version + 1
 
-        # Step 2: Initialize AI Execution record
-        execution = await ai_execution_repo.create_execution(
-            session=session,
-            obj_in=AIExecutionCreate(
-                investigation_id=investigation_id,
-                workflow_type="rca",
-                model_name="llama-3.3-70b-versatile",
-                prompt_version="1.0.0",
-                user_id=user.id if user else None,
-                system_prompt="",
-                user_prompt="",
-            ),
+        # Step 2: Provider Selection
+        if provider_override:
+            provider = provider_override
+        else:
+            ai_svc = ai_service_mod.get_ai_service()
+            provider = ai_svc.get_provider()
+
+        workflow_id = str(uuid.uuid4())
+        execution_create = AIExecutionCreate(
+            investigation_id=investigation_id,
+            workflow_id=workflow_id,
+            workflow_type="rca",
+            user_id=user.id if user else None,
+            provider="groq" if provider.__class__.__name__ == "GroqProvider" else "mock",
+            model=getattr(provider, "model", "llama-3.3-70b-versatile"),
+            prompt_version="1.0.0",
+            input_context_summary={
+                "has_unreviewed_incident_data": context.get("has_unreviewed_incident_data", False),
+                "use_documents": request.use_documents,
+            },
         )
+        execution = await ai_execution_repo.record_execution_start(session, execution_create)
 
         # Step 3: Initialize RCAAnalysis record in DRAFT
         method_str = (
@@ -135,6 +144,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=investigation_id,
             action=AuditAction.RCA_REQUESTED.value,
+            entity_type="RCAAnalysis",
+            entity_id=rca.id,
             details={
                 "rca_id": rca.id,
                 "analysis_version": new_version,
@@ -143,13 +154,6 @@ class RCAService:
                 "ai_execution_id": execution.id,
             },
         )
-
-        # Step 4: Provider Selection
-        if provider_override:
-            provider = provider_override
-        else:
-            ai_svc = ai_service_mod.get_ai_service()
-            provider = ai_svc.provider
 
         # Step 5: Execute LangGraph Workflow
         graph = create_rca_graph(provider)
@@ -166,7 +170,7 @@ class RCAService:
             "evidence_list": context["evidence_list"],
             "valid_document_map": context["valid_document_map"],
             "valid_evidence_map": context["valid_evidence_map"],
-            "compiled_prompt_context": context["context_text"],
+            "compiled_prompt_context": context.get("compiled_prompt_context", ""),
             "additional_focus": request.additional_focus,
             "token_usage": {},
             "latency_ms": 0,
@@ -226,9 +230,10 @@ class RCAService:
 
         # Step 9: Complete AI Execution Record
         token_usage = result_state.get("token_usage", {})
-        await ai_execution_repo.complete_execution(
+        await ai_execution_repo.record_execution_completion(
             session=session,
             execution_id=execution.id,
+            status="completed" if result_state.get("status") != "FAILED" else "failed",
             structured_output={
                 "problem_statement": updated_rca.problem_statement,
                 "incident_summary": updated_rca.incident_summary,
@@ -242,9 +247,7 @@ class RCAService:
                     "unsupported_assumptions", []
                 ),
             },
-            prompt_tokens=token_usage.get("prompt_tokens", 0),
-            completion_tokens=token_usage.get("completion_tokens", 0),
-            total_tokens=token_usage.get("total_tokens", 0),
+            token_usage=token_usage,
             latency_ms=result_state.get("latency_ms", 0),
         )
 
@@ -254,6 +257,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=investigation_id,
             action=AuditAction.RCA_GENERATED.value,
+            entity_type="RCAAnalysis",
+            entity_id=rca.id,
             details={
                 "rca_id": rca.id,
                 "version": new_version,
@@ -371,6 +376,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_REVIEWED.value,
+            entity_type="RCAAnalysis",
+            entity_id=rca.id,
             details={
                 "rca_id": rca.id,
                 "status": rca.status,
@@ -445,6 +452,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_CAUSE_ADDED.value,
+            entity_type="FishboneCause",
+            entity_id=cause_id,
             details={
                 "rca_id": rca.id,
                 "cause_id": cause_id,
@@ -550,6 +559,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_CAUSE_EDITED.value,
+            entity_type="FishboneCause",
+            entity_id=cause_id,
             details={
                 "rca_id": rca.id,
                 "cause_id": cause_id,
@@ -634,6 +645,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_CAUSE_VERIFIED.value,
+            entity_type="FishboneCause",
+            entity_id=cause_id,
             details={
                 "rca_id": rca.id,
                 "cause_id": cause_id,
@@ -719,6 +732,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_CAUSE_REJECTED.value,
+            entity_type="FishboneCause",
+            entity_id=cause_id,
             details={
                 "rca_id": rca.id,
                 "cause_id": cause_id,
@@ -774,6 +789,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_ACCEPTED.value,
+            entity_type="RCAAnalysis",
+            entity_id=rca.id,
             details={
                 "rca_id": rca.id,
                 "version": rca.analysis_version,
@@ -821,6 +838,8 @@ class RCAService:
             user_id=user.id if user else None,
             investigation_id=rca.investigation_id,
             action=AuditAction.RCA_EVIDENCE_REQUESTED.value,
+            entity_type="RCAAnalysis",
+            entity_id=rca.id,
             details={
                 "rca_id": rca.id,
                 "evidence_requested": request.evidence_requested,
@@ -843,9 +862,9 @@ class RCAService:
             {
                 "id": str(a.id),
                 "action": a.action,
-                "performed_by": a.performed_by,
+                "performed_by": a.user_id,
                 "timestamp": a.created_at.isoformat() if a.created_at else None,
-                "details": a.details,
+                "details": a.new_values,
             }
             for a in audits
             if a.action.startswith("RCA_")
