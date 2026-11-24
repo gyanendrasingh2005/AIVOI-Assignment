@@ -29,7 +29,7 @@ from app.models.enums import (
     AuditAction,
 )
 from app.models.user import User, Role, UserRole
-from app.models.investigation import Investigation
+from app.models.investigation import Investigation, InvestigationCounter
 from app.models.incident import Incident
 from app.models.document import Document
 from app.models.evidence import Evidence
@@ -75,6 +75,7 @@ __all__ = [
     "Role",
     "UserRole",
     "Investigation",
+    "InvestigationCounter",
     "Incident",
     "Document",
     "Evidence",

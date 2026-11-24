@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, ForeignKey
+from sqlalchemy import String, Text, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base, UUIDPrimaryKeyMixin, TimestampMixin
@@ -106,3 +106,16 @@ class Investigation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         "AuditLog",
         back_populates="investigation",
     )
+
+
+class InvestigationCounter(Base):
+    """
+    Concurrency-safe sequence counter maintaining yearly counters
+    for pharmaceutical investigation numbers (INV-YYYY-XXXXX).
+    """
+
+    __tablename__ = "investigation_counters"
+
+    year: Mapped[int] = mapped_column(Integer, primary_key=True)
+    last_value: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
