@@ -102,6 +102,11 @@ class Investigation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         back_populates="investigation",
         cascade="all, delete-orphan",
     )
+    capa_recommendations: Mapped[List["CAPARecommendation"]] = relationship(
+        "CAPARecommendation",
+        back_populates="investigation",
+        cascade="all, delete-orphan",
+    )
     approvals: Mapped[List["Approval"]] = relationship(
         "Approval",
         back_populates="investigation",

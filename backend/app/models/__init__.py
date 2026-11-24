@@ -45,6 +45,7 @@ from app.models.enums import (
     GapDetectionType,
     CompletenessDimensionStatus,
     CompletenessOverallStatus,
+    CAPARecommendationStatus,
 )
 from app.models.user import User, Role, UserRole
 from app.models.investigation import Investigation, InvestigationCounter
@@ -61,7 +62,7 @@ from app.models.rca import (
 )
 from app.models.evidence_gap import EvidenceGap
 from app.models.completeness import CompletenessAssessment
-from app.models.capa import CAPA, CAPATask, EffectivenessCheck
+from app.models.capa import CAPA, CAPATask, EffectivenessCheck, CAPARecommendation
 from app.models.approval import Approval
 from app.models.audit import AuditLog
 from app.models.token import RefreshToken
@@ -110,6 +111,7 @@ __all__ = [
     "GapDetectionType",
     "CompletenessDimensionStatus",
     "CompletenessOverallStatus",
+    "CAPARecommendationStatus",
     # Models
     "User",
     "Role",
@@ -129,6 +131,7 @@ __all__ = [
     "CompletenessAssessment",
     "CAPA",
     "CAPATask",
+    "CAPARecommendation",
     "EffectivenessCheck",
     "Approval",
     "AuditLog",

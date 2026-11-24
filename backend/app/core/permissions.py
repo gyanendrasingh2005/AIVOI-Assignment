@@ -39,10 +39,31 @@ class Permission(str, enum.Enum):
     EVIDENCE_GAP_WAIVE = "evidence_gap:waive"
     EVIDENCE_GAP_REOPEN = "evidence_gap:reopen"
 
-    # CAPA Actions
+    # CAPA Actions & Recommendations
+    CAPA_VIEW = "capa:view"
+    CAPA_RECOMMEND = "capa:recommend"
+    CAPA_EDIT = "capa:edit"
     CAPA_CREATE = "capa:create"
+    CAPA_SUBMIT = "capa:submit"
     CAPA_REVIEW = "capa:review"
     CAPA_APPROVE = "capa:approve"
+    CAPA_REJECT = "capa:reject"
+    CAPA_ASSIGN = "capa:assign"
+
+    # CAPA Tasks
+    CAPA_TASK_VIEW = "capa_task:view"
+    CAPA_TASK_EDIT = "capa_task:edit"
+    CAPA_TASK_ASSIGN = "capa_task:assign"
+    CAPA_TASK_SUBMIT = "capa_task:submit"
+    CAPA_TASK_REVIEW = "capa_task:review"
+
+    # CAPA Implementation Monitoring & Effectiveness Verification
+    CAPA_MONITORING_VIEW = "capa_monitoring:view"
+    CAPA_EFFECTIVENESS_CREATE = "capa_effectiveness:create"
+    CAPA_EFFECTIVENESS_REVIEW = "capa_effectiveness:review"
+    CAPA_EFFECTIVENESS_APPROVE = "capa_effectiveness:approve"
+    CAPA_CLOSE = "capa:close"
+    CAPA_REOPEN = "capa:reopen"
 
     # Quality Audit & Compliance
     AUDIT_VIEW = "audit:view"
@@ -64,6 +85,26 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.EVIDENCE_GAP_ASSIGN,
         Permission.EVIDENCE_GAP_RESOLVE,
         Permission.EVIDENCE_GAP_WAIVE,
+        Permission.CAPA_VIEW,
+        Permission.CAPA_RECOMMEND,
+        Permission.CAPA_EDIT,
+        Permission.CAPA_CREATE,
+        Permission.CAPA_SUBMIT,
+        Permission.CAPA_REVIEW,
+        Permission.CAPA_APPROVE,
+        Permission.CAPA_REJECT,
+        Permission.CAPA_ASSIGN,
+        Permission.CAPA_TASK_VIEW,
+        Permission.CAPA_TASK_EDIT,
+        Permission.CAPA_TASK_ASSIGN,
+        Permission.CAPA_TASK_SUBMIT,
+        Permission.CAPA_TASK_REVIEW,
+        Permission.CAPA_MONITORING_VIEW,
+        Permission.CAPA_EFFECTIVENESS_CREATE,
+        Permission.CAPA_EFFECTIVENESS_REVIEW,
+        Permission.CAPA_EFFECTIVENESS_APPROVE,
+        Permission.CAPA_CLOSE,
+        Permission.CAPA_REOPEN,
     },
     RoleName.INVESTIGATOR: {
         Permission.INVESTIGATION_CREATE,
@@ -72,7 +113,21 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.EVIDENCE_UPLOAD,
         Permission.EVIDENCE_VIEW,
         Permission.RCA_PERFORM,
+        Permission.CAPA_VIEW,
+        Permission.CAPA_RECOMMEND,
         Permission.CAPA_CREATE,
+        Permission.CAPA_EDIT,
+        Permission.CAPA_SUBMIT,
+        Permission.CAPA_REVIEW,
+        Permission.CAPA_REJECT,
+        Permission.CAPA_ASSIGN,
+        Permission.CAPA_TASK_VIEW,
+        Permission.CAPA_TASK_EDIT,
+        Permission.CAPA_TASK_ASSIGN,
+        Permission.CAPA_TASK_SUBMIT,
+        Permission.CAPA_MONITORING_VIEW,
+        Permission.CAPA_EFFECTIVENESS_CREATE,
+        Permission.CAPA_EFFECTIVENESS_REVIEW,
         Permission.EVIDENCE_GAP_VIEW,
         Permission.EVIDENCE_GAP_ASSESS,
         Permission.EVIDENCE_GAP_EDIT,
@@ -84,7 +139,26 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.EVIDENCE_VIEW,
         Permission.EVIDENCE_REVIEW,
         Permission.RCA_REVIEW,
+        Permission.CAPA_VIEW,
+        Permission.CAPA_RECOMMEND,
+        Permission.CAPA_CREATE,
+        Permission.CAPA_EDIT,
+        Permission.CAPA_SUBMIT,
         Permission.CAPA_REVIEW,
+        Permission.CAPA_APPROVE,
+        Permission.CAPA_REJECT,
+        Permission.CAPA_ASSIGN,
+        Permission.CAPA_TASK_VIEW,
+        Permission.CAPA_TASK_EDIT,
+        Permission.CAPA_TASK_ASSIGN,
+        Permission.CAPA_TASK_SUBMIT,
+        Permission.CAPA_TASK_REVIEW,
+        Permission.CAPA_MONITORING_VIEW,
+        Permission.CAPA_EFFECTIVENESS_CREATE,
+        Permission.CAPA_EFFECTIVENESS_REVIEW,
+        Permission.CAPA_EFFECTIVENESS_APPROVE,
+        Permission.CAPA_CLOSE,
+        Permission.CAPA_REOPEN,
         Permission.USERS_VIEW,
         Permission.AUDIT_VIEW,
         Permission.EVIDENCE_GAP_VIEW,
@@ -103,12 +177,19 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.EVIDENCE_VIEW,
         Permission.EVIDENCE_GAP_VIEW,
         Permission.EVIDENCE_GAP_REQUEST,
+        Permission.CAPA_VIEW,
+        Permission.CAPA_TASK_VIEW,
+        Permission.CAPA_MONITORING_VIEW,
     },
     RoleName.MANUFACTURING_OPERATOR: {
         Permission.INVESTIGATION_VIEW,
         Permission.EVIDENCE_UPLOAD,
         Permission.EVIDENCE_VIEW,
         Permission.EVIDENCE_GAP_VIEW,
+        Permission.CAPA_VIEW,
+        Permission.CAPA_TASK_VIEW,
+        Permission.CAPA_TASK_SUBMIT,
+        Permission.CAPA_MONITORING_VIEW,
     },
     RoleName.QA_APPROVER: {
         Permission.INVESTIGATION_VIEW,
@@ -116,8 +197,18 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.INVESTIGATION_APPROVE,
         Permission.EVIDENCE_VIEW,
         Permission.RCA_REVIEW,
+        Permission.CAPA_VIEW,
         Permission.CAPA_REVIEW,
         Permission.CAPA_APPROVE,
+        Permission.CAPA_REJECT,
+        Permission.CAPA_TASK_VIEW,
+        Permission.CAPA_TASK_REVIEW,
+        Permission.CAPA_MONITORING_VIEW,
+        Permission.CAPA_EFFECTIVENESS_CREATE,
+        Permission.CAPA_EFFECTIVENESS_REVIEW,
+        Permission.CAPA_EFFECTIVENESS_APPROVE,
+        Permission.CAPA_CLOSE,
+        Permission.CAPA_REOPEN,
         Permission.AUDIT_VIEW,
         Permission.EVIDENCE_GAP_VIEW,
         Permission.EVIDENCE_GAP_ASSESS,
