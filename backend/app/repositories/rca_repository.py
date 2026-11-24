@@ -335,17 +335,5 @@ class RCARepository(BaseRepository[RCAAnalysis, RCAAnalysisCreate, RCAAnalysisBa
         await session.flush()
 
 
-class EvidenceGapRepository(BaseRepository[EvidenceGap, EvidenceGapCreate, EvidenceGapUpdate]):
-    def __init__(self):
-        super().__init__(EvidenceGap)
-
-    async def get_by_investigation(
-        self, session: AsyncSession, investigation_id: str
-    ) -> List[EvidenceGap]:
-        stmt = select(EvidenceGap).where(EvidenceGap.investigation_id == investigation_id)
-        result = await session.execute(stmt)
-        return list(result.scalars().all())
-
-
 rca_repo = RCARepository()
-evidence_gap_repo = EvidenceGapRepository()
+from app.repositories.evidence_gap_repository import EvidenceGapRepository, evidence_gap_repo

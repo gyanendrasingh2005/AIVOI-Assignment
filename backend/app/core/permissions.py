@@ -28,6 +28,17 @@ class Permission(str, enum.Enum):
     RCA_PERFORM = "rca:perform"
     RCA_REVIEW = "rca:review"
 
+    # Evidence Gap & Completeness
+    EVIDENCE_GAP_VIEW = "evidence_gap:view"
+    EVIDENCE_GAP_ASSESS = "evidence_gap:assess"
+    EVIDENCE_GAP_EDIT = "evidence_gap:edit"
+    EVIDENCE_GAP_ASSIGN = "evidence_gap:assign"
+    EVIDENCE_GAP_REQUEST = "evidence_gap:request"
+    EVIDENCE_GAP_RESOLVE = "evidence_gap:resolve"
+    EVIDENCE_GAP_REJECT = "evidence_gap:reject"
+    EVIDENCE_GAP_WAIVE = "evidence_gap:waive"
+    EVIDENCE_GAP_REOPEN = "evidence_gap:reopen"
+
     # CAPA Actions
     CAPA_CREATE = "capa:create"
     CAPA_REVIEW = "capa:review"
@@ -48,6 +59,11 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.INVESTIGATION_EDIT,
         Permission.EVIDENCE_VIEW,
         Permission.AUDIT_VIEW,
+        Permission.EVIDENCE_GAP_VIEW,
+        Permission.EVIDENCE_GAP_EDIT,
+        Permission.EVIDENCE_GAP_ASSIGN,
+        Permission.EVIDENCE_GAP_RESOLVE,
+        Permission.EVIDENCE_GAP_WAIVE,
     },
     RoleName.INVESTIGATOR: {
         Permission.INVESTIGATION_CREATE,
@@ -57,6 +73,10 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.EVIDENCE_VIEW,
         Permission.RCA_PERFORM,
         Permission.CAPA_CREATE,
+        Permission.EVIDENCE_GAP_VIEW,
+        Permission.EVIDENCE_GAP_ASSESS,
+        Permission.EVIDENCE_GAP_EDIT,
+        Permission.EVIDENCE_GAP_REQUEST,
     },
     RoleName.QA: {
         Permission.INVESTIGATION_VIEW,
@@ -67,16 +87,28 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.CAPA_REVIEW,
         Permission.USERS_VIEW,
         Permission.AUDIT_VIEW,
+        Permission.EVIDENCE_GAP_VIEW,
+        Permission.EVIDENCE_GAP_ASSESS,
+        Permission.EVIDENCE_GAP_EDIT,
+        Permission.EVIDENCE_GAP_ASSIGN,
+        Permission.EVIDENCE_GAP_REQUEST,
+        Permission.EVIDENCE_GAP_RESOLVE,
+        Permission.EVIDENCE_GAP_REJECT,
+        Permission.EVIDENCE_GAP_WAIVE,
+        Permission.EVIDENCE_GAP_REOPEN,
     },
     RoleName.QC: {
         Permission.INVESTIGATION_VIEW,
         Permission.EVIDENCE_UPLOAD,
         Permission.EVIDENCE_VIEW,
+        Permission.EVIDENCE_GAP_VIEW,
+        Permission.EVIDENCE_GAP_REQUEST,
     },
     RoleName.MANUFACTURING_OPERATOR: {
         Permission.INVESTIGATION_VIEW,
         Permission.EVIDENCE_UPLOAD,
         Permission.EVIDENCE_VIEW,
+        Permission.EVIDENCE_GAP_VIEW,
     },
     RoleName.QA_APPROVER: {
         Permission.INVESTIGATION_VIEW,
@@ -87,6 +119,15 @@ ROLE_PERMISSIONS: Dict[RoleName, Set[Permission]] = {
         Permission.CAPA_REVIEW,
         Permission.CAPA_APPROVE,
         Permission.AUDIT_VIEW,
+        Permission.EVIDENCE_GAP_VIEW,
+        Permission.EVIDENCE_GAP_ASSESS,
+        Permission.EVIDENCE_GAP_EDIT,
+        Permission.EVIDENCE_GAP_ASSIGN,
+        Permission.EVIDENCE_GAP_REQUEST,
+        Permission.EVIDENCE_GAP_RESOLVE,
+        Permission.EVIDENCE_GAP_REJECT,
+        Permission.EVIDENCE_GAP_WAIVE,
+        Permission.EVIDENCE_GAP_REOPEN,
     },
 }
 

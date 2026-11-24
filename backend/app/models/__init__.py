@@ -41,6 +41,10 @@ from app.models.enums import (
     CauseStatus,
     CauseClassification,
     Fishbone6MCategory,
+    GapCategory,
+    GapDetectionType,
+    CompletenessDimensionStatus,
+    CompletenessOverallStatus,
 )
 from app.models.user import User, Role, UserRole
 from app.models.investigation import Investigation, InvestigationCounter
@@ -56,6 +60,7 @@ from app.models.rca import (
     FishboneCause,
 )
 from app.models.evidence_gap import EvidenceGap
+from app.models.completeness import CompletenessAssessment
 from app.models.capa import CAPA, CAPATask, EffectivenessCheck
 from app.models.approval import Approval
 from app.models.audit import AuditLog
@@ -101,6 +106,10 @@ __all__ = [
     "CauseStatus",
     "CauseClassification",
     "Fishbone6MCategory",
+    "GapCategory",
+    "GapDetectionType",
+    "CompletenessDimensionStatus",
+    "CompletenessOverallStatus",
     # Models
     "User",
     "Role",
@@ -117,6 +126,7 @@ __all__ = [
     "FishboneCategory",
     "FishboneCause",
     "EvidenceGap",
+    "CompletenessAssessment",
     "CAPA",
     "CAPATask",
     "EffectivenessCheck",
