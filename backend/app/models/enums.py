@@ -40,6 +40,8 @@ class DocumentProcessingStatus(str, enum.Enum):
     PENDING = "Pending"
     PROCESSING = "Processing"
     COMPLETED = "Completed"
+    PARTIALLY_COMPLETED = "Partially Completed"
+    OCR_REQUIRED = "OCR Required"
     FAILED = "Failed"
 
 
@@ -154,3 +156,5 @@ class AuditAction(str, enum.Enum):
     APPROVE = "APPROVE"
     REJECT = "REJECT"
     STATUS_CHANGE = "STATUS_CHANGE"
+    READ = "READ"
+    DOWNLOAD = "DOWNLOAD"
