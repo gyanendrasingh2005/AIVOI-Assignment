@@ -26,7 +26,7 @@ class DocumentContextPreparationService:
         self,
         session: AsyncSession,
         investigation_id: str,
-        document_ids: List[str],
+        document_ids: Optional[List[str]] = None,
         max_chars: Optional[int] = None,
     ) -> Tuple[str, List[DocumentProcessingSummary], List[Document]]:
         """
@@ -39,20 +39,25 @@ class DocumentContextPreparationService:
         context_parts: List[str] = []
         current_length = 0
 
-        for doc_id in document_ids:
-            doc = await document_repo.get(session, doc_id)
-            if not doc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Source document {doc_id} not found.",
-                )
+        if document_ids is None:
+            docs_to_process = await document_repo.get_by_investigation(session, investigation_id)
+        else:
+            docs_to_process = []
+            for doc_id in document_ids:
+                doc = await document_repo.get(session, doc_id)
+                if not doc:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"Source document {doc_id} not found.",
+                    )
+                if doc.investigation_id != investigation_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Security violation: Document {doc_id} does not belong to investigation {investigation_id}.",
+                    )
+                docs_to_process.append(doc)
 
-            # Security check: verify document belongs to the target investigation
-            if doc.investigation_id != investigation_id:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Security violation: Document {doc_id} does not belong to investigation {investigation_id}.",
-                )
+        for doc in docs_to_process:
 
             # Check for archived status
             if doc.is_archived:

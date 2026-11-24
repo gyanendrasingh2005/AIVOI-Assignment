@@ -25,7 +25,7 @@ from app.repositories.risk_assessment_repository import risk_assessment_repo
 from app.repositories.approval_audit_repository import audit_repo
 from app.services.document_context_service import document_context_service
 from app.ai.providers.base import BaseAIProvider
-from app.ai.services.ai_service import get_ai_service
+import app.ai.services.ai_service as ai_service_mod
 from app.ai.graphs.risk_state import RiskAssessmentWorkflowState
 from app.ai.graphs.risk_builder import create_risk_assessment_graph
 from app.ai.schemas.execution import AIExecutionCreate
@@ -130,7 +130,7 @@ class RiskAssessmentService:
             valid_doc_map = {doc.id: doc.original_filename for doc in analyzable_docs}
 
         # Step 3: Provider selection
-        ai_service = get_ai_service()
+        ai_service = ai_service_mod.get_ai_service()
         provider = provider_override or ai_service.provider
 
         # Step 4: AIExecution tracking record
@@ -512,3 +512,4 @@ class RiskAssessmentService:
 
 
 risk_assessment_service = RiskAssessmentService()
+
