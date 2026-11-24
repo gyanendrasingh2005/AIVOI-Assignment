@@ -59,3 +59,4 @@ class CompletenessHistoryResponse(BaseModel):
     investigation_id: str
     total_versions: int
     assessments: List[CompletenessHistoryItem]
+

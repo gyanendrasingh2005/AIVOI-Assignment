@@ -37,3 +37,4 @@ class GapAssessmentWorkflowState(TypedDict):
     # Error handling & status
     error_message: Optional[str]
     is_failed: bool
+

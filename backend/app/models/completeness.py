@@ -70,3 +70,4 @@ class CompletenessAssessment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         "AIExecution",
         foreign_keys=[ai_execution_id],
     )
+

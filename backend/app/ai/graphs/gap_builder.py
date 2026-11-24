@@ -60,3 +60,4 @@ def create_gap_assessment_graph():
     graph.add_edge("calculate_completeness", END)
 
     return graph.compile()
+

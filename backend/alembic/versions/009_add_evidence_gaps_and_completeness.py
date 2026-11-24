@@ -95,3 +95,4 @@ def downgrade() -> None:
     op.drop_column('evidence_gaps', 'detection_type')
     op.drop_column('evidence_gaps', 'category')
     op.drop_column('evidence_gaps', 'gap_title')
+

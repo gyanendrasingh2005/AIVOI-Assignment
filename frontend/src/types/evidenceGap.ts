@@ -184,3 +184,4 @@ export interface GapHistoryEntry {
   details: Record<string, any>;
   timestamp: string;
 }
+
