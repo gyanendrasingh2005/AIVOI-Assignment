@@ -45,6 +45,10 @@ from app.repositories.incident_extraction_repository import (
     IncidentExtractionRepository,
     incident_extraction_repo,
 )
+from app.repositories.risk_assessment_repository import (
+    RiskAssessmentRepository,
+    risk_assessment_repo,
+)
 
 __all__ = [
     "BaseRepository",
@@ -76,5 +80,7 @@ __all__ = [
     "ai_execution_repo",
     "IncidentExtractionRepository",
     "incident_extraction_repo",
+    "RiskAssessmentRepository",
+    "risk_assessment_repo",
 ]
 

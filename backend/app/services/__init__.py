@@ -36,6 +36,10 @@ from app.services.incident_extraction_service import (
     IncidentExtractionService,
     incident_extraction_service,
 )
+from app.services.risk_assessment_service import (
+    RiskAssessmentService,
+    risk_assessment_service,
+)
 
 __all__ = [
     "AuthService",
@@ -62,5 +66,7 @@ __all__ = [
     "document_context_service",
     "IncidentExtractionService",
     "incident_extraction_service",
+    "RiskAssessmentService",
+    "risk_assessment_service",
 ]
 
