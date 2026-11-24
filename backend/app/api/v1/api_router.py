@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import health, auth, users, investigations, documents, ai, rca
+from app.api.v1.endpoints import health, auth, users, investigations, documents, ai, rca, evidence_gaps
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(investigations.router)
 api_router.include_router(documents.router)
 api_router.include_router(ai.router)
 api_router.include_router(rca.router)
+api_router.include_router(evidence_gaps.router)
