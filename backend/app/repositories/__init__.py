@@ -41,6 +41,10 @@ from app.repositories.ai_execution_repository import (
     AIExecutionRepository,
     ai_execution_repo,
 )
+from app.repositories.incident_extraction_repository import (
+    IncidentExtractionRepository,
+    incident_extraction_repo,
+)
 
 __all__ = [
     "BaseRepository",
@@ -70,5 +74,7 @@ __all__ = [
     "token_repo",
     "AIExecutionRepository",
     "ai_execution_repo",
+    "IncidentExtractionRepository",
+    "incident_extraction_repo",
 ]
 

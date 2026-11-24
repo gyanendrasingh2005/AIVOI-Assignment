@@ -28,6 +28,14 @@ from app.services.document_service import (
     DocumentService,
     document_service,
 )
+from app.services.document_context_service import (
+    DocumentContextPreparationService,
+    document_context_service,
+)
+from app.services.incident_extraction_service import (
+    IncidentExtractionService,
+    incident_extraction_service,
+)
 
 __all__ = [
     "AuthService",
@@ -50,5 +58,9 @@ __all__ = [
     "PageExtractionResult",
     "DocumentService",
     "document_service",
+    "DocumentContextPreparationService",
+    "document_context_service",
+    "IncidentExtractionService",
+    "incident_extraction_service",
 ]
 
