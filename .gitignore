@@ -65,6 +65,13 @@ backend/storage/
 *.pdf
 !backend/tests/**/*.pdf
 
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+pharmarca.db
+backend/pharmarca.db
+
 # IDE and OS files
 .idea/
 .vscode/

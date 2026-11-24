@@ -21,16 +21,23 @@ def is_database_reachable(host: str, port: int, timeout: float = 0.5) -> bool:
         return False
 
 
-# Initialize async engine with connection pooling
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=False,
-    pool_size=10,
-    max_overflow=20,
-    pool_recycle=3600,
-    pool_pre_ping=True,
-    connect_args={"timeout": 2.0},
-)
+# Initialize async engine with connection pooling or SQLite config
+if settings.DATABASE_URL.startswith("sqlite"):
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=False,
+        connect_args={"check_same_thread": False},
+    )
+else:
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=False,
+        pool_size=10,
+        max_overflow=20,
+        pool_recycle=3600,
+        pool_pre_ping=True,
+        connect_args={"timeout": 2.0},
+    )
 
 # Configure session factory
 AsyncSessionLocal = async_sessionmaker(
@@ -56,8 +63,29 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def check_database_connection() -> dict:
-    """Verifies PostgreSQL connectivity and returns response latency."""
+    """Verifies database connectivity and returns response latency."""
     start_time = time.time()
+    
+    # Fast path for SQLite local development
+    if settings.DATABASE_URL.startswith("sqlite"):
+        try:
+            async with AsyncSessionLocal() as session:
+                await session.execute(text("SELECT 1"))
+            latency_ms = round((time.time() - start_time) * 1000, 2)
+            return {
+                "connected": True,
+                "database": "SQLite (Local/Standalone)",
+                "latency_ms": latency_ms,
+                "error": None,
+            }
+        except Exception as exc:
+            latency_ms = round((time.time() - start_time) * 1000, 2)
+            return {
+                "connected": False,
+                "database": "SQLite",
+                "latency_ms": latency_ms,
+                "error": str(exc),
+            }
     
     # 1. Quick pre-flight socket probe to prevent socket hangs if database is offline
     host = settings.POSTGRES_SERVER

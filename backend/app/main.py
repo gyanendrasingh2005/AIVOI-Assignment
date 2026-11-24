@@ -22,9 +22,26 @@ async def lifespan(app: FastAPI):
     logger.info(f"Starting {settings.PROJECT_NAME} v{settings.VERSION} [{settings.ENVIRONMENT}]")
     db_check = await check_database_connection()
     if db_check["connected"]:
-        logger.info(f"Connected to PostgreSQL cluster ({db_check['database']}, Latency: {db_check['latency_ms']}ms)")
+        logger.info(f"Connected to database ({db_check['database']}, Latency: {db_check['latency_ms']}ms)")
+        if settings.DATABASE_URL.startswith("sqlite"):
+            from app.database.base import Base
+            from app.database.session import engine, AsyncSessionLocal
+            from app.cli import seed_standard_roles, bootstrap_admin
+            from sqlalchemy import text
+            import app.models  # noqa: F401
+            async with engine.begin() as conn:
+                await conn.execute(text("PRAGMA foreign_keys = ON;"))
+                await conn.run_sync(Base.metadata.create_all)
+            async with AsyncSessionLocal() as session:
+                await seed_standard_roles(session)
+            await bootstrap_admin(
+                email="admin@pharmarca.com",
+                password="AdminPassword123!",
+                full_name="Quality System Admin",
+            )
+            logger.info("Local SQLite schema initialized and admin bootstrapped (admin@pharmarca.com)")
     else:
-        logger.warning(f"PostgreSQL connection check failed during startup: {db_check['error']}")
+        logger.warning(f"Database connection check failed during startup: {db_check['error']}")
     yield
     logger.info(f"Shutting down {settings.PROJECT_NAME}")
 
