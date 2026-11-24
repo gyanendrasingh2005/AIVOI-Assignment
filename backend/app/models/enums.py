@@ -159,6 +159,12 @@ class AuditAction(str, enum.Enum):
     READ = "READ"
     DOWNLOAD = "DOWNLOAD"
     AI_EXECUTE = "AI_EXECUTE"
+    AI_EXTRACTION_REQUESTED = "AI_EXTRACTION_REQUESTED"
+    AI_EXTRACTION_COMPLETED = "AI_EXTRACTION_COMPLETED"
+    AI_EXTRACTION_REVIEWED = "AI_EXTRACTION_REVIEWED"
+    AI_FIELD_ACCEPTED = "AI_FIELD_ACCEPTED"
+    AI_FIELD_REJECTED = "AI_FIELD_REJECTED"
+    AI_EXTRACTION_REJECTED = "AI_EXTRACTION_REJECTED"
 
 
 class AIExecutionStatus(str, enum.Enum):
@@ -166,4 +172,32 @@ class AIExecutionStatus(str, enum.Enum):
     PROCESSING = "PROCESSING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+
+
+class ExtractionStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class ExtractionReviewStatus(str, enum.Enum):
+    PENDING_REVIEW = "PENDING_REVIEW"
+    PARTIALLY_ACCEPTED = "PARTIALLY_ACCEPTED"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+
+
+class FieldExtractionStatus(str, enum.Enum):
+    EXTRACTED = "EXTRACTED"
+    NOT_FOUND = "NOT_FOUND"
+    CONFLICTING = "CONFLICTING"
+    NEEDS_REVIEW = "NEEDS_REVIEW"
+
+
+class FieldReviewDecision(str, enum.Enum):
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+
 
