@@ -44,6 +44,10 @@ from app.services.rca_context_service import (
     RCAContextPreparationService,
     rca_context_service,
 )
+from app.services.rca_service import (
+    RCAService,
+    rca_service,
+)
 
 __all__ = [
     "AuthService",
@@ -74,5 +78,7 @@ __all__ = [
     "risk_assessment_service",
     "RCAContextPreparationService",
     "rca_context_service",
+    "RCAService",
+    "rca_service",
 ]
 
