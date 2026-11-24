@@ -9,6 +9,25 @@ from app.services.investigation_service import (
     InvestigationService,
     investigation_service,
 )
+from app.services.storage_service import (
+    BaseStorageService,
+    LocalStorageService,
+    get_storage_service,
+)
+from app.services.document_validation_service import (
+    DocumentValidationService,
+    document_validator,
+)
+from app.services.extraction_service import (
+    DocumentExtractionService,
+    extraction_service,
+    DocumentExtractionResult,
+    PageExtractionResult,
+)
+from app.services.document_service import (
+    DocumentService,
+    document_service,
+)
 
 __all__ = [
     "AuthService",
@@ -20,5 +39,16 @@ __all__ = [
     "VALID_TRANSITIONS",
     "InvestigationService",
     "investigation_service",
+    "BaseStorageService",
+    "LocalStorageService",
+    "get_storage_service",
+    "DocumentValidationService",
+    "document_validator",
+    "DocumentExtractionService",
+    "extraction_service",
+    "DocumentExtractionResult",
+    "PageExtractionResult",
+    "DocumentService",
+    "document_service",
 ]
 
