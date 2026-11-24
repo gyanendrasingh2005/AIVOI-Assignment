@@ -63,7 +63,20 @@ class AuditLogRepository(BaseRepository[AuditLog, AuditLogCreate, AuditLogBase])
         stmt = (
             select(AuditLog)
             .where(AuditLog.entity_type == entity_type, AuditLog.entity_id == entity_id)
+            .options(selectinload(AuditLog.user))
             .order_by(AuditLog.created_at.desc())
+        )
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_by_investigation(
+        self, session: AsyncSession, investigation_id: str
+    ) -> List[AuditLog]:
+        stmt = (
+            select(AuditLog)
+            .where(AuditLog.investigation_id == investigation_id)
+            .options(selectinload(AuditLog.user))
+            .order_by(AuditLog.created_at.asc())
         )
         result = await session.execute(stmt)
         return list(result.scalars().all())

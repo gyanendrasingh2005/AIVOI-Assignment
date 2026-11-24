@@ -29,9 +29,18 @@ from app.schemas.incident import (
 from app.schemas.investigation import (
     InvestigationBase,
     InvestigationCreate,
+    InvestigationCreateRequest,
+    InvestigationUpdateRequest,
+    InvestigationTransitionRequest,
+    InvestigationAssignRequest,
     InvestigationUpdate,
     InvestigationResponse,
+    InvestigationListItem,
+    InvestigationListResponse,
     InvestigationDetailResponse,
+    TimelineEvent,
+    InvestigationTimelineResponse,
+    DashboardSummaryResponse,
 )
 from app.schemas.document import (
     DocumentBase,
