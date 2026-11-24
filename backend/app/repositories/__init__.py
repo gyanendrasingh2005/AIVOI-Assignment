@@ -19,9 +19,15 @@ from app.repositories.document_evidence_repository import (
 )
 from app.repositories.rca_repository import (
     RCARepository,
-    EvidenceGapRepository,
     rca_repo,
+)
+from app.repositories.evidence_gap_repository import (
+    EvidenceGapRepository,
     evidence_gap_repo,
+)
+from app.repositories.completeness_repository import (
+    CompletenessAssessmentRepository,
+    completeness_repo,
 )
 from app.repositories.capa_repository import (
     CAPARepository,
