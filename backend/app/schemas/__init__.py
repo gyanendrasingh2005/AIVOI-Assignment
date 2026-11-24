@@ -1,11 +1,24 @@
 from app.schemas.health import HealthStatusResponse, DatabaseHealthResponse
+from app.schemas.token import (
+    TokenResponse,
+    TokenRefreshRequest,
+    TokenRevokeRequest,
+    TokenPayload,
+)
 from app.schemas.user import (
     RoleBase,
     RoleResponse,
     UserBase,
     UserCreate,
     UserUpdate,
+    UserRegister,
+    UserLogin,
+    PasswordChange,
+    UserProfileUpdate,
+    UserStatusUpdate,
+    UserRoleAssign,
     UserResponse,
+    UserListResponse,
 )
 from app.schemas.incident import (
     IncidentBase,
@@ -86,7 +99,18 @@ __all__ = [
     "UserBase",
     "UserCreate",
     "UserUpdate",
+    "UserRegister",
+    "UserLogin",
+    "PasswordChange",
+    "UserProfileUpdate",
+    "UserStatusUpdate",
+    "UserRoleAssign",
     "UserResponse",
+    "UserListResponse",
+    "TokenResponse",
+    "TokenRefreshRequest",
+    "TokenRevokeRequest",
+    "TokenPayload",
     "IncidentBase",
     "IncidentCreate",
     "IncidentUpdate",
@@ -140,3 +164,4 @@ __all__ = [
     "AuditLogCreate",
     "AuditLogResponse",
 ]
+
