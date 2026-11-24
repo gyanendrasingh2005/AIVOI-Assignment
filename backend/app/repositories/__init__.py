@@ -33,6 +33,10 @@ from app.repositories.approval_audit_repository import (
     approval_repo,
     audit_repo,
 )
+from app.repositories.token_repository import (
+    TokenRepository,
+    token_repo,
+)
 
 __all__ = [
     "BaseRepository",
@@ -58,4 +62,7 @@ __all__ = [
     "AuditLogRepository",
     "approval_repo",
     "audit_repo",
+    "TokenRepository",
+    "token_repo",
 ]
+
