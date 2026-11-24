@@ -120,6 +120,21 @@ from app.schemas.extraction import (
     FieldRejectionRequest,
     ExtractionReviewViewResponse,
 )
+from app.schemas.risk_assessment import (
+    RiskEvidenceReference,
+    DimensionEvaluation,
+    MissingEvidenceItem,
+    ConflictingEvidenceItem,
+    RiskAssessmentStructuredOutput,
+    RiskAssessmentRequest,
+    RiskAssessmentReviewPatchRequest,
+    RiskAssessmentAcceptRequest,
+    RiskAssessmentRejectRequest,
+    RiskAssessmentInfoRequest,
+    RiskAssessmentResponse,
+    RiskAssessmentListResponse,
+    RiskAssessmentReviewViewResponse,
+)
 
 __all__ = [
     "HealthStatusResponse",
@@ -206,5 +221,18 @@ __all__ = [
     "FieldAcceptanceRequest",
     "FieldRejectionRequest",
     "ExtractionReviewViewResponse",
+    "RiskEvidenceReference",
+    "DimensionEvaluation",
+    "MissingEvidenceItem",
+    "ConflictingEvidenceItem",
+    "RiskAssessmentStructuredOutput",
+    "RiskAssessmentRequest",
+    "RiskAssessmentReviewPatchRequest",
+    "RiskAssessmentAcceptRequest",
+    "RiskAssessmentRejectRequest",
+    "RiskAssessmentInfoRequest",
+    "RiskAssessmentResponse",
+    "RiskAssessmentListResponse",
+    "RiskAssessmentReviewViewResponse",
 ]
 
