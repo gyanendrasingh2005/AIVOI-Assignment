@@ -38,6 +38,9 @@ from app.models.enums import (
     InvestigationUrgency,
     RiskAssessmentStatus,
     RiskAssessmentReviewStatus,
+    CauseStatus,
+    CauseClassification,
+    Fishbone6MCategory,
 )
 from app.models.user import User, Role, UserRole
 from app.models.investigation import Investigation, InvestigationCounter
@@ -95,6 +98,9 @@ __all__ = [
     "InvestigationUrgency",
     "RiskAssessmentStatus",
     "RiskAssessmentReviewStatus",
+    "CauseStatus",
+    "CauseClassification",
+    "Fishbone6MCategory",
     # Models
     "User",
     "Role",

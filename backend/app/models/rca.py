@@ -1,5 +1,6 @@
-from typing import List, Optional
-from sqlalchemy import String, Integer, Text, Boolean, ForeignKey
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from sqlalchemy import String, Integer, Text, Boolean, ForeignKey, Float, DateTime, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base, UUIDPrimaryKeyMixin, TimestampMixin
@@ -35,10 +36,73 @@ class RCAAnalysis(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         String(30),
         default=RCAStatus.DRAFT.value,
         nullable=False,
+        index=True,
     )
     created_by: Mapped[Optional[str]] = mapped_column(
         String(36),
         ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
+    # AI tracking & prompt versioning
+    ai_execution_id: Mapped[Optional[str]] = mapped_column(
+        String(36),
+        ForeignKey("ai_executions.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    prompt_version: Mapped[str] = mapped_column(
+        String(20),
+        default="1.0.0",
+        nullable=False,
+    )
+
+    # Narrative overview & structured payloads
+    problem_statement: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    incident_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    five_whys_data: Mapped[List[Any]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
+    fishbone_data: Mapped[Dict[str, Any]] = mapped_column(
+        JSON,
+        default=dict,
+        nullable=False,
+    )
+    root_causes_data: Mapped[List[Any]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
+    contributing_factors_data: Mapped[List[Any]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
+    rejected_hypotheses_data: Mapped[List[Any]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
+    evidence_gaps_data: Mapped[List[Any]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
+
+    # Human review states
+    reviewer_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reviewed_by: Mapped[Optional[str]] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
         nullable=True,
     )
 
@@ -47,7 +111,10 @@ class RCAAnalysis(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         "Investigation",
         back_populates="rca_analyses",
     )
-    creator: Mapped[Optional["User"]] = relationship("User")
+    creator: Mapped[Optional["User"]] = relationship("User", foreign_keys=[created_by])
+    reviewer: Mapped[Optional["User"]] = relationship("User", foreign_keys=[reviewed_by], backref="reviewed_rcas")
+    ai_execution = relationship("AIExecution", backref="rca_analyses")
+
     root_causes: Mapped[List["RootCause"]] = relationship(
         "RootCause",
         back_populates="rca_analysis",
@@ -96,6 +163,13 @@ class RootCause(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     ai_generated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     human_confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    confidence_score: Mapped[float] = mapped_column(Float, default=0.8, nullable=False)
+    supporting_references: Mapped[List[Any]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Relationships
     rca_analysis: Mapped["RCAAnalysis"] = relationship(
@@ -160,6 +234,12 @@ class WhyAnalysisStep(Base, UUIDPrimaryKeyMixin):
     evidence_reference: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     is_root_cause: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    explanation: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    confidence_score: Mapped[float] = mapped_column(Float, default=0.8, nullable=False)
+    verification_status: Mapped[str] = mapped_column(String(30), default="PROPOSED", nullable=False)
+    assumptions: Mapped[List[Any]] = mapped_column(JSON, default=list, nullable=False)
+    supporting_references: Mapped[List[Any]] = mapped_column(JSON, default=list, nullable=False)
+
     rca_analysis: Mapped["RCAAnalysis"] = relationship(
         "RCAAnalysis",
         back_populates="why_steps",
@@ -207,9 +287,15 @@ class FishboneCause(Base, UUIDPrimaryKeyMixin):
         nullable=True,
         index=True,
     )
+    cause_title: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     cause_description: Mapped[str] = mapped_column(Text, nullable=False)
     evidence_reference: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     is_significant: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    confidence_score: Mapped[float] = mapped_column(Float, default=0.8, nullable=False)
+    verification_status: Mapped[str] = mapped_column(String(30), default="PROPOSED", nullable=False)
+    potential_impact: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    supporting_references: Mapped[List[Any]] = mapped_column(JSON, default=list, nullable=False)
 
     category: Mapped["FishboneCategory"] = relationship(
         "FishboneCategory",
