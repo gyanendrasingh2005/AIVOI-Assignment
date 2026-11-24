@@ -5,6 +5,8 @@ from app.ai.graphs.extraction_state import IncidentExtractionWorkflowState
 from app.ai.graphs.extraction_builder import create_incident_extraction_graph
 from app.ai.graphs.risk_state import RiskAssessmentWorkflowState
 from app.ai.graphs.risk_builder import create_risk_assessment_graph
+from app.ai.graphs.rca_state import RCAWorkflowState
+from app.ai.graphs.rca_builder import create_rca_graph
 
 __all__ = [
     "WorkflowState",
@@ -13,5 +15,7 @@ __all__ = [
     "create_incident_extraction_graph",
     "RiskAssessmentWorkflowState",
     "create_risk_assessment_graph",
+    "RCAWorkflowState",
+    "create_rca_graph",
 ]
 

@@ -7,12 +7,14 @@ from typing import Optional, Dict
 
 from app.ai.prompts.incident_extraction import SYSTEM_INCIDENT_EXTRACTION_V1
 from app.ai.prompts.risk_assessment import SYSTEM_RISK_ASSESSMENT_V1
+from app.ai.prompts.rca import SYSTEM_RCA_V1
 
 PROMPT_VERSIONS: Dict[str, str] = {
     "analytical_assistant": "1.0.0",
     "base_workflow": "1.0.0",
     "incident_extraction": "1.0.0",
     "risk_assessment": "1.0.0",
+    "rca": "1.0.0",
 }
 
 SYSTEM_ANALYTICAL_ASSISTANT_V1 = """You are an expert AI Analytical Assistant specializing in Active Pharmaceutical Ingredient (API) manufacturing quality investigations and Root Cause Analysis (RCA).
@@ -45,5 +47,7 @@ def get_system_prompt(name: str = "analytical_assistant", version: Optional[str]
         return SYSTEM_INCIDENT_EXTRACTION_V1
     elif name == "risk_assessment":
         return SYSTEM_RISK_ASSESSMENT_V1
+    elif name == "rca":
+        return SYSTEM_RCA_V1
     return SYSTEM_ANALYTICAL_ASSISTANT_V1
 
