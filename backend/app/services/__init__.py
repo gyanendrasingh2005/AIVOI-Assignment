@@ -40,6 +40,10 @@ from app.services.risk_assessment_service import (
     RiskAssessmentService,
     risk_assessment_service,
 )
+from app.services.rca_context_service import (
+    RCAContextPreparationService,
+    rca_context_service,
+)
 
 __all__ = [
     "AuthService",
@@ -68,5 +72,7 @@ __all__ = [
     "incident_extraction_service",
     "RiskAssessmentService",
     "risk_assessment_service",
+    "RCAContextPreparationService",
+    "rca_context_service",
 ]
 
