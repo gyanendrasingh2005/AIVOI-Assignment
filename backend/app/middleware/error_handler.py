@@ -1,6 +1,7 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.exc import SQLAlchemyError
 from app.core.exceptions import PharmaRCAException
 from app.core.logging import logger
@@ -26,7 +27,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={
             "error": True,
             "message": "Input validation failed according to pharmaceutical schema rules.",
-            "details": exc.errors(),
+            "details": jsonable_encoder(exc.errors()),
             "path": request.url.path,
         },
     )

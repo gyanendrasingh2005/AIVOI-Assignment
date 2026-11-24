@@ -1,7 +1,9 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import health
+from app.api.v1.endpoints import health, auth, users
 
 api_router = APIRouter()
 
-# Include health router under /api/v1
+# Mount endpoints under /api/v1
 api_router.include_router(health.router)
+api_router.include_router(auth.router)
+api_router.include_router(users.router)
