@@ -68,18 +68,23 @@ class AuditLogRepository(BaseRepository[AuditLog, AuditLogCreate, AuditLogBase])
         investigation_id: Optional[str] = None,
         old_values: Optional[Any] = None,
         new_values: Optional[Any] = None,
+        details: Optional[Any] = None,
     ) -> AuditLog:
         """Helper alias accepting enum or string action."""
         act_str = action.value if hasattr(action, "value") else str(action)
+        effective_new_values = new_values if new_values is not None else details
+        effective_inv_id = investigation_id
+        if not effective_inv_id and isinstance(details, dict):
+            effective_inv_id = details.get("investigation_id")
         return await self.log_event(
             session=session,
             action=act_str,
             entity_type=entity_type,
             entity_id=entity_id,
             user_id=user_id,
-            investigation_id=investigation_id,
+            investigation_id=effective_inv_id,
             old_values=old_values,
-            new_values=new_values,
+            new_values=effective_new_values,
         )
 
     async def get_history_for_entity(
