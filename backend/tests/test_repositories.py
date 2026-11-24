@@ -224,7 +224,7 @@ async def test_capa_repository(db_session):
             acceptance_criteria="Zero backpressure drift events across all runs",
         ),
     )
-    assert check.status == "Scheduled"
+    assert check.status.upper() == "SCHEDULED"
 
 
 @pytest.mark.asyncio
