@@ -48,8 +48,10 @@ class Settings(BaseSettings):
     # AI Configuration (Groq & LangGraph)
     GROQ_API_KEY: str = "placeholder_key"
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
-    GROQ_MAX_RETRIES: int = 3
+    GROQ_TIMEOUT: int = 30
+    GROQ_MAX_RETRIES: int = 2
     GROQ_TEMPERATURE: float = 0.1
+    GROQ_MAX_TOKENS: int = 4096
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
