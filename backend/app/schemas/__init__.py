@@ -46,6 +46,12 @@ from app.schemas.document import (
     DocumentBase,
     DocumentCreate,
     DocumentResponse,
+    DocumentTextIngestRequest,
+    DocumentListItem,
+    DocumentListResponse,
+    DocumentPageItem,
+    DocumentExtractedTextResponse,
+    ExtractionTriggerResponse,
 )
 from app.schemas.evidence import (
     EvidenceBase,

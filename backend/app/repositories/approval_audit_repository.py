@@ -57,6 +57,31 @@ class AuditLogRepository(BaseRepository[AuditLog, AuditLogCreate, AuditLogBase])
         await session.refresh(audit_entry)
         return audit_entry
 
+    async def record_action(
+        self,
+        session: AsyncSession,
+        *,
+        action: Any,
+        entity_type: str,
+        entity_id: str,
+        user_id: Optional[str] = None,
+        investigation_id: Optional[str] = None,
+        old_values: Optional[Any] = None,
+        new_values: Optional[Any] = None,
+    ) -> AuditLog:
+        """Helper alias accepting enum or string action."""
+        act_str = action.value if hasattr(action, "value") else str(action)
+        return await self.log_event(
+            session=session,
+            action=act_str,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            user_id=user_id,
+            investigation_id=investigation_id,
+            old_values=old_values,
+            new_values=new_values,
+        )
+
     async def get_history_for_entity(
         self, session: AsyncSession, entity_type: str, entity_id: str
     ) -> List[AuditLog]:

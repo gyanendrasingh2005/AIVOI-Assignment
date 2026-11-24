@@ -14,7 +14,7 @@ class EvidenceBase(BaseModel):
 
 
 class EvidenceCreate(EvidenceBase):
-    investigation_id: str
+    investigation_id: Optional[str] = None
     document_id: Optional[str] = None
     verification_status: EvidenceVerificationStatus = EvidenceVerificationStatus.UNVERIFIED
 
