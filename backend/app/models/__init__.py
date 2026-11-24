@@ -45,6 +45,7 @@ from app.models.evidence_gap import EvidenceGap
 from app.models.capa import CAPA, CAPATask, EffectivenessCheck
 from app.models.approval import Approval
 from app.models.audit import AuditLog
+from app.models.token import RefreshToken
 
 __all__ = [
     # Enums
@@ -89,4 +90,5 @@ __all__ = [
     "EffectivenessCheck",
     "Approval",
     "AuditLog",
+    "RefreshToken",
 ]

@@ -86,3 +86,9 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         "AuditLog",
         back_populates="user",
     )
+    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
+        "RefreshToken",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
