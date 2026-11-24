@@ -6,6 +6,7 @@ from sqlalchemy import event, text
 from httpx import AsyncClient, ASGITransport
 
 from app.database.base import Base
+from app.database.session import get_db
 from app.main import app as fastapi_app
 import app.models  # noqa: F401 - Register all models in Base.metadata
 
@@ -41,7 +42,12 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest_asyncio.fixture
-async def client():
+async def client(db_session: AsyncSession):
+    async def override_get_db():
+        yield db_session
+
+    fastapi_app.dependency_overrides[get_db] = override_get_db
     transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
         yield ac
+    fastapi_app.dependency_overrides.clear()
